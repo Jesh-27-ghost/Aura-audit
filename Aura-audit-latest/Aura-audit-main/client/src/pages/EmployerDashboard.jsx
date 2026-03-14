@@ -1,0 +1,380 @@
+import { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { searchCandidates } from '../api';
+import { QRCodeSVG } from 'qrcode.react';
+
+import {
+    Search, Users, Award, TrendingUp, AlertTriangle,
+    Mail, X, ExternalLink, Filter, Briefcase, ChevronDown,
+    Shield, Code, Terminal
+} from 'lucide-react';
+import SkillSearch from '../components/SkillSearch';
+
+const skillLevels = ['', 'Beginner', 'Intermediate', 'Advanced', 'Expert'];
+const skillOptions = [
+    '', 'React Frontend Development', 'Node.js API Development',
+    'JavaScript Debugging', 'SQL Database Querying',
+    'Python Scripting', 'DevOps / Docker'
+];
+
+export default function EmployerDashboard() {
+    const { user } = useAuth();
+    const [candidates, setCandidates] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [searchSkill, setSearchSkill] = useState('');
+    const [minScore, setMinScore] = useState('');
+    const [level, setLevel] = useState('');
+    const [selectedCandidate, setSelectedCandidate] = useState(null);
+
+    const fetchCandidates = async (isBackground = false) => {
+        if (!isBackground) setLoading(true);
+        try {
+            const params = {};
+            if (searchSkill) params.skill = searchSkill;
+            if (minScore) params.minScore = minScore;
+            if (level) params.level = level;
+
+            const { data } = await searchCandidates(params);
+            setCandidates(data);
+        } catch (err) {
+            console.error('Failed to search candidates:', err);
+        } finally {
+            if (!isBackground) setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchCandidates();
+
+        const interval = setInterval(() => {
+            fetchCandidates(true);
+        }, 10000);
+
+        return () => clearInterval(interval);
+    }, [searchSkill, minScore, level]);
+
+    // Callback when a skill is selected from the SkillSearchBar
+    const handleSkillSelect = useCallback((skillName) => {
+        setSearchSkill(skillName);
+    }, []);
+
+    const handleSearch = (e) => {
+        e.preventDefault();
+        fetchCandidates();
+        e.preventDefault();
+        fetchCandidates();
+    };
+
+    const getScoreClass = (score) => {
+        if (score >= 85) return 'score-high';
+        if (score >= 70) return 'score-medium';
+        return 'score-low';
+    };
+
+    const getScoreColor = (score) => {
+        if (score >= 85) return 'var(--accent-emerald)';
+        if (score >= 70) return 'var(--accent-gold)';
+        return 'var(--accent-rose)';
+    };
+
+    const getBarGradient = (score) => {
+        if (score >= 85) return 'linear-gradient(90deg, #10b981, #34d399)';
+        if (score >= 70) return 'linear-gradient(90deg, #f59e0b, #fbbf24)';
+        return 'linear-gradient(90deg, #ef4444, #f87171)';
+    };
+
+    return (
+        <div className="dashboard" id="employer-dashboard">
+            <div className="dashboard-header">
+                <h1>Employer Dashboard</h1>
+                <p>Find verified, AI-assessed candidates for your team</p>
+            </div>
+
+            {/* Interactive Skill Search Component */}
+            <SkillSearch 
+                value={searchSkill} 
+                onSelectSkill={handleSkillSelect} 
+                onClear={() => handleSkillSelect('')} 
+            />
+
+            {/* Candidate Filters */}
+            <form onSubmit={handleSearch} className="search-bar" id="candidate-search" style={{ marginTop: '-1rem' }}>
+                {searchSkill ? (
+                    <div className="form-select" style={{ display: 'flex', alignItems: 'center', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '8px', padding: '0 12px' }}>
+                        <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+                            {`Skill: ${searchSkill}`}
+                        </span>
+                        <button type="button" onClick={() => handleSkillSelect('')} style={{ background: 'none', border: 'none', marginLeft: 'auto', cursor: 'pointer', color: 'var(--text-muted)' }}>
+                            <X size={14} />
+                        </button>
+                    </div>
+                ) : (
+                    <div className="form-select" style={{ display: 'flex', alignItems: 'center', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '8px', padding: '0 12px' }}>
+                         <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>All Skills</span>
+                    </div>
+                )}
+                <input
+                    type="number"
+                    className="form-input"
+                    placeholder="Min Score (0-100)"
+                    value={minScore}
+                    onChange={(e) => setMinScore(e.target.value)}
+                    min="0"
+                    max="100"
+                    id="search-min-score"
+                />
+                <select
+                    className="form-select"
+                    value={level}
+                    onChange={(e) => setLevel(e.target.value)}
+                    id="search-level"
+                >
+                    <option value="">All Levels</option>
+                    {skillLevels.filter(Boolean).map(l => (
+                        <option key={l} value={l}>{l}</option>
+                    ))}
+                </select>
+                <button type="submit" className="btn btn-primary" id="search-submit">
+                    <Search size={18} /> Search
+                </button>
+            </form>
+
+            {/* Results Count */}
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
+                <Users size={16} style={{ verticalAlign: 'middle', marginRight: '6px' }} />
+                {candidates.length} verified candidate{candidates.length !== 1 ? 's' : ''} found
+            </p>
+
+            {/* Candidates Grid */}
+            {loading ? (
+                <div className="loading-container" style={{ minHeight: '30vh' }}>
+                    <div className="spinner"></div>
+                    <p className="loading-text">Searching candidates...</p>
+                </div>
+            ) : candidates.length === 0 ? (
+                <div className="empty-state">
+                    <div className="icon"><Search size={48} /></div>
+                    <h3>No candidates found</h3>
+                    <p>Try adjusting your search filters</p>
+                </div>
+            ) : (
+                <div className="dashboard-grid">
+                    {candidates.map((item, i) => (
+                        <div className="candidate-card" key={i}>
+                            <div className="candidate-header">
+                                <div className="candidate-info">
+                                    <h3>{item.candidate.name}</h3>
+                                    <p className="candidate-skill">{item.assessment.skillName}</p>
+                                </div>
+                                <span className={`candidate-score-badge ${getScoreClass(item.assessment.overallScore)}`}>
+                                    {item.assessment.overallScore}
+                                </span>
+                            </div>
+
+                            {item.assessment.code && (
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', color: 'var(--accent-primary)', marginBottom: '0.5rem', fontWeight: 600 }}>
+                                    <Code size={12} /> Code Challenge Session
+                                </div>
+                            )}
+
+                            <span className={`badge-level badge-level-${item.assessment.skillLevel?.toLowerCase()}`}>
+                                {item.assessment.skillLevel}
+                            </span>
+
+                            <div className="badge-tags" style={{ justifyContent: 'flex-start', marginTop: '0.75rem', marginBottom: '0.75rem' }}>
+                                {item.assessment.verifiedSkills?.slice(0, 3).map((skill, j) => (
+                                    <span className="skill-tag" key={j}>{skill}</span>
+                                ))}
+                            </div>
+
+                            <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: '1rem', fontStyle: 'italic' }}>
+                                "{item.assessment.employerSummary}"
+                            </p>
+
+                            <div style={{ display: 'flex', gap: '8px' }}>
+                                <button
+                                    className="btn btn-primary btn-sm"
+                                    onClick={() => setSelectedCandidate(item)}
+                                    style={{ flex: 1 }}
+                                >
+                                    View Full Report
+                                </button>
+                                {item.badgeId && (
+                                    <Link to={`/verify/${item.badgeId}`} className="btn btn-secondary btn-sm">
+                                        <ExternalLink size={14} />
+                                    </Link>
+                                )}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+
+            {/* Detail Modal */}
+            {selectedCandidate && (
+                <div className="modal-overlay" onClick={() => setSelectedCandidate(null)}>
+                    <div className="modal" onClick={(e) => e.stopPropagation()}>
+                        <div className="modal-header">
+                            <h2>{selectedCandidate.candidate.name}</h2>
+                            <button className="modal-close" onClick={() => setSelectedCandidate(null)}>
+                                <X size={18} />
+                            </button>
+                        </div>
+
+                        {/* Score Overview */}
+                        <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center', marginBottom: '2rem' }}>
+                            <div className="score-circle">
+                                <svg width="120" height="120" viewBox="0 0 120 120">
+                                    <circle className="score-circle-bg" cx="60" cy="60" r="52" />
+                                    <circle
+                                        className="score-circle-fill"
+                                        cx="60" cy="60" r="52"
+                                        stroke={getScoreColor(selectedCandidate.assessment.overallScore)}
+                                        strokeDasharray={`${(selectedCandidate.assessment.overallScore / 100) * 326.7} 326.7`}
+                                    />
+                                </svg>
+                                <div className="score-circle-text" style={{ color: getScoreColor(selectedCandidate.assessment.overallScore) }}>
+                                    {selectedCandidate.assessment.overallScore}
+                                </div>
+                            </div>
+                            <div>
+                                <p style={{ color: 'var(--accent-primary)', fontWeight: 600, marginBottom: '0.25rem' }}>
+                                    {selectedCandidate.assessment.skillName}
+                                </p>
+                                <span className={`badge-level badge-level-${selectedCandidate.assessment.skillLevel?.toLowerCase()}`}>
+                                    {selectedCandidate.assessment.skillLevel}
+                                </span>
+                                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
+                                    Assessed: {new Date(selectedCandidate.assessment.createdAt).toLocaleDateString()}
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Dimensions */}
+                        {Object.entries(selectedCandidate.assessment.dimensions || {}).map(([key, dim]) => (
+                            <div key={key} style={{ marginBottom: '1rem' }}>
+                                <div className="dimension-header">
+                                    <span className="dimension-name" style={{ textTransform: 'capitalize' }}>
+                                        {key.replace(/([A-Z])/g, ' $1').trim()}
+                                    </span>
+                                    <span className="dimension-score" style={{ color: getScoreColor(dim.score) }}>
+                                        {dim.score}
+                                    </span>
+                                </div>
+                                <div className="score-bar">
+                                    <div className="score-bar-fill" style={{ width: `${dim.score}%`, background: getBarGradient(dim.score) }}></div>
+                                </div>
+                                <p className="dimension-observation">{dim.observation}</p>
+                            </div>
+                        ))}
+
+                        {/* Strengths & Improvements */}
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', margin: '1.5rem 0' }}>
+                            <div>
+                                <h4 style={{ fontSize: '0.9rem', fontWeight: 600, marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                    <TrendingUp size={14} style={{ color: 'var(--accent-emerald)' }} /> Strengths
+                                </h4>
+                                <ul style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', paddingLeft: '1rem', lineHeight: 1.8 }}>
+                                    {selectedCandidate.assessment.strengths?.map((s, i) => <li key={i}>{s}</li>)}
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 style={{ fontSize: '0.9rem', fontWeight: 600, marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                    <AlertTriangle size={14} style={{ color: 'var(--accent-gold)' }} /> To Improve
+                                </h4>
+                                <ul style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', paddingLeft: '1rem', lineHeight: 1.8 }}>
+                                    {selectedCandidate.assessment.improvements?.map((s, i) => <li key={i}>{s}</li>)}
+                                </ul>
+                            </div>
+                        </div>
+
+                        {/* Code and Suspicion Logs (NEW) */}
+                        {selectedCandidate.assessment.code && (
+                            <div style={{ marginTop: '1.5rem', borderTop: '1px solid var(--border-color)', paddingTop: '1.5rem' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                                    <h4 style={{ fontSize: '0.9rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                        <Shield size={14} className="text-gold" /> SkillProof Integrity Logs
+                                    </h4>
+                                    {selectedCandidate.assessment.suspicionScore && (
+                                        <div style={{ display: 'flex', gap: '15px' }}>
+                                            <span style={{ fontSize: '0.75rem', color: selectedCandidate.assessment.suspicionScore.tabSwitches > 0 ? '#ff4444' : 'var(--text-muted)' }}>
+                                                Tab Switches: <strong>{selectedCandidate.assessment.suspicionScore.tabSwitches}</strong>
+                                            </span>
+                                            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                                                Focus Loss: <strong>{selectedCandidate.assessment.suspicionScore.blurEvents}</strong>
+                                            </span>
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1rem' }}>
+                                    <div>
+                                        <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                            <Code size={12} /> Candidate Solution
+                                        </p>
+                                        <pre style={{ 
+                                            background: '#0d1117', 
+                                            padding: '1rem', 
+                                            borderRadius: '8px', 
+                                            fontSize: '0.75rem', 
+                                            maxHeight: '150px', 
+                                            overflowY: 'auto',
+                                            color: '#e6edf3',
+                                            border: '1px solid rgba(255,255,255,0.1)'
+                                        }}>
+                                            <code>{selectedCandidate.assessment.code}</code>
+                                        </pre>
+                                    </div>
+                                    <div>
+                                        <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                            <Terminal size={12} /> Execution Output
+                                        </p>
+                                        <pre style={{ 
+                                            background: '#000', 
+                                            padding: '1rem', 
+                                            borderRadius: '8px', 
+                                            fontSize: '0.75rem', 
+                                            maxHeight: '100px', 
+                                            overflowY: 'auto',
+                                            color: '#10b981',
+                                            border: '1px solid rgba(255,255,255,0.1)'
+                                        }}>
+                                            <code>{selectedCandidate.assessment.output || 'No output.'}</code>
+                                        </pre>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Verified Skills */}
+                        <div className="badge-tags" style={{ justifyContent: 'flex-start', marginBottom: '1.5rem' }}>
+                            {selectedCandidate.assessment.verifiedSkills?.map((skill, i) => (
+                                <span className="skill-tag" key={i}>{skill}</span>
+                            ))}
+                        </div>
+
+                        {/* Contact Button */}
+                        <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                            <a
+                                href={`mailto:${selectedCandidate.candidate.email}`}
+                                className="btn btn-gold btn-sm"
+                            >
+                                <Mail size={16} /> Contact: {selectedCandidate.candidate.email}
+                            </a>
+                            {selectedCandidate.badgeId && (
+                                <Link
+                                    to={`/verify/${selectedCandidate.badgeId}`}
+                                    className="btn btn-secondary btn-sm"
+                                    onClick={() => setSelectedCandidate(null)}
+                                >
+                                    <Award size={16} /> View Badge
+                                </Link>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}
