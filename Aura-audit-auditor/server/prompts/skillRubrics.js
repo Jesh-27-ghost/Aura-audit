@@ -421,12 +421,47 @@ CRITICAL FLAWS TO FLAG:
  * This uses Zero-Shot Chain-of-Thought: the model is asked to reason through
  * each layer sequentially, with explicit "think step-by-step" instructions.
  */
-const getAssessmentPrompt = (skillName, industry) => {
+const getAssessmentPrompt = (skillName, industry, confidenceValue = 50) => {
   const rubric = skillRubrics[skillName];
   const specificInstructions = rubric ? rubric.specificInstructions : '';
   const dimensions = rubric ? rubric.dimensions.join(', ') : 'Technical Accuracy, Efficiency, Best Practices, Problem Solving';
 
+  // Map confidence value to difficulty calibration for the AI
+  let difficultyCalibration = '';
+  if (confidenceValue <= 25) {
+    difficultyCalibration = `
+DIFFICULTY CALIBRATION: BASIC LEVEL (Candidate Confidence: ${confidenceValue}/100)
+The candidate has indicated LOW confidence. Apply these adjustments:
+- Be encouraging in feedback while remaining honest about skill gaps.
+- Weight "effort and approach" slightly higher than "perfect execution."
+- Provide more detailed improvement suggestions since the candidate is learning.
+- A passing score (70+) still requires genuine competency — do NOT lower the bar.`;
+  } else if (confidenceValue <= 50) {
+    difficultyCalibration = `
+DIFFICULTY CALIBRATION: DEVELOPING SKILLS (Candidate Confidence: ${confidenceValue}/100)
+The candidate has indicated MODERATE confidence. Apply standard grading:
+- Use the default calibration scale without adjustments.
+- Provide balanced feedback with both strengths and improvements.`;
+  } else if (confidenceValue <= 75) {
+    difficultyCalibration = `
+DIFFICULTY CALIBRATION: STRONG UNDERSTANDING (Candidate Confidence: ${confidenceValue}/100)
+The candidate has indicated HIGH confidence. Apply slightly stricter grading:
+- Expect professional-level code organization and best practices.
+- Penalize more heavily for missing error handling, edge cases, and security.
+- Strengths should highlight advanced techniques, not just basic competency.`;
+  } else {
+    difficultyCalibration = `
+DIFFICULTY CALIBRATION: CHALLENGE MODE (Candidate Confidence: ${confidenceValue}/100)
+The candidate has indicated EXPERT confidence. Apply the STRICTEST grading:
+- Expect expert-level mastery: clean architecture, performance optimization, advanced patterns.
+- ANY missing best practice should result in a dimension score penalty.
+- A score above 80 requires genuinely exceptional work.
+- Flaws section must be thorough — even minor issues should be called out at this level.
+- The candidate asked to be challenged: hold them to the highest standard.`;
+  }
+
   return `SYSTEM ROLE: You are SkillBuster Sentinel — a dual-role AI that functions as BOTH a forensic video integrity analyst AND a professional ${industry} skill assessor. You have been trained on adversarial attack patterns and have 15 years of domain expertise.
+${difficultyCalibration}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 HARD CONSTRAINTS (OVERRIDE ALL OTHER REASONING)

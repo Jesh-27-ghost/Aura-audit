@@ -2,6 +2,7 @@ const express = require('express');
 const { protect, authorize } = require('../middleware/auth');
 const {
     createTask,
+    generateAITask,
     getTasks,
     getTask,
     updateTask,
@@ -15,6 +16,9 @@ router.get('/', protect, getTasks);
 
 // POST /api/tasks — Create a new task (employer only)
 router.post('/', protect, authorize('employer'), createTask);
+
+// POST /api/tasks/generate — Generate a task via AI (employer only)
+router.post('/generate', protect, authorize('employer'), generateAITask);
 
 // GET /api/tasks/:id — Get single task
 router.get('/:id', protect, getTask);

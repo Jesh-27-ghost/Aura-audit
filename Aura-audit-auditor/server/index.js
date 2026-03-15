@@ -31,6 +31,7 @@ const leaderboardRoutes = require('./routes/leaderboard');
 const analyticsRoutes = require('./routes/analytics');
 const taskRoutes = require('./routes/tasks');
 const taskSubmissionRoutes = require('./routes/task-submissions');
+const cvRoutes = require('./routes/cv');
 const { getSkillCategories } = require('./prompts/skillRubrics');
 
 app.use('/api/auth', authRoutes);
@@ -42,6 +43,7 @@ app.use('/api/leaderboard', leaderboardRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/task-submissions', taskSubmissionRoutes);
+app.use('/api/cv', cvRoutes);
 
 // GET /api/skills — Get available skill categories
 app.get('/api/skills', (req, res) => {

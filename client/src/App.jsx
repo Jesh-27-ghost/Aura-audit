@@ -11,6 +11,7 @@ import ScoreCardPage from './pages/ScoreCardPage';
 import BadgeView from './pages/BadgeView';
 import EmployerDashboard from './pages/EmployerDashboard';
 import VerifyBadge from './pages/VerifyBadge';
+import CVUpload from './pages/CVUpload';
 
 function ProtectedRoute({ children, role }) {
     const { user, loading } = useAuth();
@@ -50,6 +51,14 @@ function AppRoutes() {
                     element={
                         <ProtectedRoute role="candidate">
                             <RecordTask />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/cv-upload"
+                    element={
+                        <ProtectedRoute role="candidate">
+                            <CVUpload />
                         </ProtectedRoute>
                     }
                 />

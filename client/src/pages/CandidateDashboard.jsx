@@ -80,17 +80,30 @@ export default function CandidateDashboard() {
                 </div>
             </div>
 
-            {/* Quick Action */}
-            <Link to="/record" className="card" id="record-task-cta" style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', marginBottom: '2rem', textDecoration: 'none' }}>
-                <div className="card-icon card-icon-purple" style={{ margin: 0, flexShrink: 0 }}>
-                    <Video size={28} />
-                </div>
-                <div style={{ flex: 1 }}>
-                    <h3 style={{ marginBottom: '0.25rem' }}>Record a New Skill Assessment</h3>
-                    <p>Choose a skill, record your task, and let Gemini AI verify your abilities</p>
-                </div>
-                <ArrowRight size={24} style={{ color: 'var(--accent-primary)', flexShrink: 0 }} />
-            </Link>
+            {/* Quick Actions */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '2rem' }}>
+                <Link to="/cv-upload" className="card" style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', textDecoration: 'none' }}>
+                    <div className="card-icon card-icon-gold" style={{ margin: 0, flexShrink: 0 }}>
+                        <Shield size={24} />
+                    </div>
+                    <div style={{ flex: 1 }}>
+                        <h4 style={{ marginBottom: '0.15rem' }}>AI CV Analysis</h4>
+                        <p style={{ fontSize: '0.85rem' }}>Optimize your profile & tiers</p>
+                    </div>
+                    <ArrowRight size={20} style={{ color: 'var(--accent-gold)', flexShrink: 0 }} />
+                </Link>
+
+                <Link to="/record" className="card" style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', textDecoration: 'none' }}>
+                    <div className="card-icon card-icon-purple" style={{ margin: 0, flexShrink: 0 }}>
+                        <Video size={24} />
+                    </div>
+                    <div style={{ flex: 1 }}>
+                        <h4 style={{ marginBottom: '0.15rem' }}>Skill Assessment</h4>
+                        <p style={{ fontSize: '0.85rem' }}>Verify via video demo</p>
+                    </div>
+                    <ArrowRight size={20} style={{ color: 'var(--accent-primary)', flexShrink: 0 }} />
+                </Link>
+            </div>
 
             {/* Badges Grid */}
             <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 700, marginBottom: '1.5rem' }}>

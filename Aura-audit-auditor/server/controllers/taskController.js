@@ -5,12 +5,12 @@ const path = require('path');
 const { store } = require('../store');
 const { getAssessmentPrompt } = require('../prompts/skillRubrics');
 const { getSuspicionPrompt } = require('../prompts/suspicionPrompt');
+const { getTaskGenerationPrompt } = require('../prompts/taskGeneration');
 
-// Model priority list
+// Model priority list — use valid, available model names
 const MODEL_PRIORITY = [
     'gemini-2.5-flash',
     'gemini-2.0-flash',
-    'gemini-2.0-flash-lite',
     'gemini-1.5-flash',
 ];
 
@@ -49,15 +49,23 @@ async function callGeminiWithVideo(fileUri, fileMimeType, prompt, apiKey) {
                 return { data: parsed, model: modelName };
             } catch (err) {
                 lastError = err;
+                console.warn(`⚠️ [Task] ${modelName} attempt ${attempt} failed: ${err.message?.substring(0, 150)}`);
+
+                const isNotFound = err.status === 404 || err.message?.includes('404') || err.message?.includes('not found');
+                if (isNotFound) {
+                    console.warn(`⚠️ [Task] Model ${modelName} not available, skipping to next...`);
+                    break;
+                }
+
                 const isQuota = err.message?.includes('429') ||
                     err.message?.includes('quota') ||
                     err.message?.includes('rate') ||
                     err.message?.includes('Resource has been exhausted') ||
                     err.status === 429;
 
-                console.warn(`⚠️ [Task] ${modelName} attempt ${attempt} failed: ${err.message?.substring(0, 120)}`);
+                const isOverloaded = err.status === 503 || err.message?.includes('503') || err.message?.includes('overloaded');
 
-                if (isQuota && attempt < MAX_RETRIES) {
+                if ((isQuota || isOverloaded) && attempt < MAX_RETRIES) {
                     const waitSec = 10 * Math.pow(2, attempt - 1);
                     console.log(`⏳ [Task] Waiting ${waitSec}s before retry...`);
                     await sleep(waitSec * 1000);
@@ -68,6 +76,59 @@ async function callGeminiWithVideo(fileUri, fileMimeType, prompt, apiKey) {
         }
     }
     throw lastError || new Error('All Gemini models failed');
+}
+
+/**
+ * Call Gemini with a text prompt only (no file)
+ */
+async function callGeminiText(prompt, apiKey) {
+    const genAI = new GoogleGenerativeAI(apiKey);
+    let lastError = null;
+    const MAX_RETRIES = 4;
+
+    for (const modelName of MODEL_PRIORITY) {
+        for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+            try {
+                console.log(`🤖 [TaskAI] Trying model: ${modelName} (attempt ${attempt}/${MAX_RETRIES})...`);
+                const model = genAI.getGenerativeModel({ model: modelName });
+
+                const result = await model.generateContent(prompt);
+                const response = await result.response;
+                let responseText = response.text();
+                console.log(`✅ [TaskAI] ${modelName} responded successfully`);
+
+                responseText = responseText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+                const parsed = JSON.parse(responseText);
+                return { data: parsed, model: modelName };
+            } catch (err) {
+                lastError = err;
+                console.warn(`⚠️ [TaskAI] ${modelName} attempt ${attempt} failed: ${err.message?.substring(0, 150)}`);
+
+                const isNotFound = err.status === 404 || err.message?.includes('404') || err.message?.includes('not found');
+                if (isNotFound) {
+                    console.warn(`⚠️ [TaskAI] Model ${modelName} not available, skipping to next...`);
+                    break;
+                }
+
+                const isQuota = err.message?.includes('429') ||
+                    err.message?.includes('quota') ||
+                    err.message?.includes('rate') ||
+                    err.message?.includes('Resource has been exhausted') ||
+                    err.status === 429;
+
+                const isOverloaded = err.status === 503 || err.message?.includes('503') || err.message?.includes('overloaded');
+
+                if ((isQuota || isOverloaded) && attempt < MAX_RETRIES) {
+                    const waitSec = 15 * attempt;
+                    console.log(`⏳ [TaskAI] Rate limited. Waiting ${waitSec}s before retry...`);
+                    await sleep(waitSec * 1000);
+                    continue;
+                }
+                break;
+            }
+        }
+    }
+    throw lastError || new Error('All Gemini models failed to generate task');
 }
 
 /**
@@ -131,6 +192,39 @@ const createTask = (req, res) => {
     } catch (error) {
         console.error('Task creation error:', error);
         res.status(500).json({ message: 'Failed to create task', error: error.message });
+    }
+};
+
+/**
+ * Generate a task using AI
+ * POST /api/tasks/generate
+ */
+const generateAITask = async (req, res) => {
+    try {
+        const { skillName, timeLimitMinutes } = req.body;
+
+        if (!skillName || !timeLimitMinutes) {
+            return res.status(400).json({ message: 'skillName and timeLimitMinutes are required' });
+        }
+
+        if (!process.env.GEMINI_API_KEY) {
+            return res.status(500).json({ message: 'GEMINI_API_KEY not configured' });
+        }
+
+        console.log(`🧠 Generating AI task for ${skillName} (${timeLimitMinutes} min)...`);
+        const prompt = getTaskGenerationPrompt(skillName, timeLimitMinutes);
+        
+        const result = await callGeminiText(prompt, process.env.GEMINI_API_KEY);
+        
+        console.log(`✅ AI generated task: "${result.data.title}" using ${result.model}`);
+        res.json({ 
+            message: 'Task generated',
+            task: result.data,
+            model: result.model
+        });
+    } catch (error) {
+        console.error('Task generation error:', error);
+        res.status(500).json({ message: 'Failed to generate task via AI', error: error.message });
     }
 };
 
@@ -255,6 +349,10 @@ const submitTaskTest = async (req, res) => {
         console.log(`📝 Task Submission: "${task.title}" by ${req.user.name}`);
         console.log(`   Skill: ${task.skillName} | Time Limit: ${task.timeLimitMinutes}min`);
 
+        // Extract confidence value from form data
+        const confidenceValue = parseInt(req.body.confidenceValue) || 50;
+        console.log(`   Confidence Level: ${confidenceValue}/100`);
+
         // ── PASS 1: Skill Assessment from Screen Recording ──
         try {
             const screenFile = await uploadAndProcessVideo(
@@ -263,7 +361,7 @@ const submitTaskTest = async (req, res) => {
                 `task-screen-${task.skillName}-${Date.now()}`
             );
 
-            const skillPrompt = getAssessmentPrompt(task.skillName, 'IT / Software');
+            const skillPrompt = getAssessmentPrompt(task.skillName, 'IT / Software', confidenceValue);
             const skillResult = await callGeminiWithVideo(
                 screenFile.uri,
                 screenFile.mimeType,
@@ -345,6 +443,7 @@ const submitTaskTest = async (req, res) => {
             verifiedSkills: skillReport.verifiedSkills || [],
             // Suspicion report
             suspicionScore: suspicionReport.suspicionScore,
+            suspicionReasons: suspicionReport.suspicionReasons || [],
             suspicionConfidence: suspicionReport.confidenceLevel,
             behavioralSummary: suspicionReport.behavioralSummary,
             suspicionDetails: suspicionReport,
@@ -352,7 +451,8 @@ const submitTaskTest = async (req, res) => {
             screenVideoPath,
             webcamVideoPath: webcamVideoPath || '',
             analyzedBy: usedModel,
-            timeLimitMinutes: task.timeLimitMinutes
+            timeLimitMinutes: task.timeLimitMinutes,
+            confidenceValue
         });
 
         console.log(`✅ Submission saved: ${submission._id}`);
@@ -448,6 +548,7 @@ function getDefaultSuspicionReport(reason) {
 
 module.exports = {
     createTask,
+    generateAITask,
     getTasks,
     getTask,
     updateTask,

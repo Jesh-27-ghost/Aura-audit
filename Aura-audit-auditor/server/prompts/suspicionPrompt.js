@@ -16,11 +16,14 @@ VIDEO SOURCE: Candidate's webcam (front-facing camera)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 BEHAVIORAL ANALYSIS CHECKLIST & CONTEXT
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-CRITICAL CONTEXT: The candidate is taking a technical coding assessment. They are expected to:
+CRITICAL CONTEXT (LENIENCY MUST BE HIGH): The candidate is taking a technical coding assessment. They are expected to:
 1. Type on their keyboard (frequent glancing down is normal and NOT suspicious).
 2. Stare intently at the screen while reading instructions or debugging (this is focus, not freezing).
 3. Rest their chin on their hand or look away blankly while thinking through a logic problem (normal human behavior).
 4. Mumble or read instructions quietly to themselves (normal focus technique).
+5. GLANCE DOWN AT THE KEYBOARD FREQUENTLY while typing logic. 
+
+WARNING: DO NOT award high suspicion scores (above 30) unless you see CLEAR evidence of external aids (mobile phones, other people, or reading from a second monitor that is NOT the main display). Standard focus on the workstation should result in a score < 20.
 
 Analyze the webcam footage for EACH of these categories. For each, note specific timestamps and evidence.
 
@@ -60,6 +63,7 @@ OUTPUT SCHEMA (STRICT JSON)
   "suspicionScore": <integer 0-100>,
   "confidenceLevel": "<low | medium | high>",
   "behavioralSummary": "<2-3 sentence summary of observed behavior>",
+  "suspicionReasons": ["<List of specific evidence points for the suspicion score>"],
   "eyeMovement": {
     "score": <0-100>,
     "observation": "<what you observed about eye patterns>"

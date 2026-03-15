@@ -57,4 +57,8 @@ export const getSkills = () => API.get('/skills');
 // Candidates (employer)
 export const searchCandidates = (params) => API.get('/candidates', { params });
 
+// CV & Adaptive (NEW)
+export const getCVProfiles = () => API.get('/cv/profiles');
+export const generateAdaptiveTest = (data) => API.post('/cv/generate-test', data);
+
 export default API;

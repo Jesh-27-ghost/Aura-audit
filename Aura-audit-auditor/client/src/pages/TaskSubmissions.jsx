@@ -200,9 +200,16 @@ export default function TaskSubmissions() {
                                                         {getSuspicionLabel(sub.suspicionScore)}
                                                     </span>
                                                 </div>
-                                                <p style={{ fontSize: '0.9rem', color: 'var(--text-primary)', lineHeight: 1.5, margin: 0 }}>
+                                                <p style={{ fontSize: '0.9rem', color: 'var(--text-primary)', lineHeight: 1.5, margin: 0, marginBottom: (sub.suspicionReasons?.length > 0 || sub.suspicionDetails?.suspicionReasons?.length > 0) ? '1rem' : 0 }}>
                                                     {sub.behavioralSummary || (sub.suspicionDetails?.behavioralSummary)}
                                                 </p>
+                                                {(sub.suspicionReasons?.length > 0 || sub.suspicionDetails?.suspicionReasons?.length > 0) && (
+                                                    <ul style={{ margin: 0, paddingLeft: '1.2rem', fontSize: '0.85rem', color: 'var(--text-secondary)', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                                        {(sub.suspicionReasons || sub.suspicionDetails?.suspicionReasons).map((reason, i) => (
+                                                            <li key={i}>{reason}</li>
+                                                        ))}
+                                                    </ul>
+                                                )}
                                             </div>
 
                                             {sub.suspicionDetails?.flaggedMoments?.length > 0 && (

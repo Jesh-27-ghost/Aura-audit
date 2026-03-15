@@ -21,6 +21,7 @@ import TaskSubmissions from './pages/TaskSubmissions';
 import CandidateTaskList from './pages/CandidateTaskList';
 import CandidateTaskTest from './pages/CandidateTaskTest';
 import CandidateTaskSubmissionView from './pages/CandidateTaskSubmissionView';
+import CandidateCVUpload from './pages/CandidateCVUpload';
 
 function ProtectedRoute({ children, role }) {
     const { user, loading } = useAuth();
@@ -71,6 +72,14 @@ function AppRoutes() {
                     element={
                         <ProtectedRoute role="candidate">
                             <CandidateTaskList />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/cv-upload"
+                    element={
+                        <ProtectedRoute role="candidate">
+                            <CandidateCVUpload />
                         </ProtectedRoute>
                     }
                 />

@@ -66,8 +66,9 @@ export const getAnalyticsCandidate = () => API.get('/analytics/candidate');
 export const getAnalyticsTalent = (skill) => API.get('/analytics/talent', { params: skill ? { skill } : {} });
 export const getSkillProgress = () => API.get('/analytics/skill-progress');
 
-// Tasks (Employer)
+// Task Endpoints
 export const createTask = (data) => API.post('/tasks', data);
+export const generateTaskAI = (data) => API.post('/tasks/generate', data);
 export const getTasks = (params) => API.get('/tasks', { params });
 export const getTaskById = (id) => API.get(`/tasks/${id}`);
 export const updateTask = (id, data) => API.put(`/tasks/${id}`, data);
@@ -82,5 +83,15 @@ export const submitTaskTest = (taskId, formData) =>
 export const getTaskSubmission = (id) => API.get(`/task-submissions/${id}`);
 export const getMyTaskSubmissions = () => API.get('/task-submissions/my');
 export const getTaskSubmissions = (taskId) => API.get(`/task-submissions/task/${taskId}`);
+
+// CV Processing
+export const uploadCV = (formData) => 
+    API.post('/cv/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+        timeout: 60000 // 1 minute allowed for parsing and Gemini review
+    });
+export const getMyCVProfile = () => API.get('/cv/profile');
+export const getAllCVProfiles = () => API.get('/cv/profiles');
+export const generateAdaptiveTest = (data) => API.post('/cv/generate-test', data);
 
 export default API;

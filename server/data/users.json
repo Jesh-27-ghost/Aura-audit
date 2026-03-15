@@ -38,5 +38,125 @@
     "skills": [],
     "bio": "",
     "createdAt": "2026-03-07T21:03:07.620Z"
+  },
+  {
+    "_id": "mmqqf2vr-16s31s3l6",
+    "name": "Test Candidate",
+    "email": "candidate_test@test.com",
+    "password": "$2a$12$bIHT0Ww9kaR8V2JlkZi.2ewc2cCWoOGHiOdrCmxp.vEDvU5p2YXoS",
+    "role": "candidate",
+    "skills": [],
+    "bio": "",
+    "createdAt": "2026-03-14T19:41:55.671Z"
+  },
+  {
+    "_id": "mmqqfduj-sdxzkfi08",
+    "name": "Test Candidate",
+    "email": "test1@test.com",
+    "password": "$2a$12$uyUJ.fvrkUdGrX0pY0PdPexLi9.P9U67QMzMz7XG5EH6djNLyFMUO",
+    "role": "candidate",
+    "skills": [],
+    "bio": "",
+    "createdAt": "2026-03-14T19:42:09.883Z"
+  },
+  {
+    "_id": "mmqqhplz-e8ck6thgz",
+    "name": "Test Candidate",
+    "email": "candidate@test.com",
+    "password": "$2a$12$qQuglSnaGNE98bCmBUAyGeu/0bEhj1hmZb7bIWI6VVAWU/MsAZqFS",
+    "role": "candidate",
+    "skills": [],
+    "bio": "",
+    "createdAt": "2026-03-14T19:43:58.439Z"
+  },
+  {
+    "_id": "mmqqic52-6w2v95orc",
+    "name": "Test Candidate",
+    "email": "candidate_cv_test@test.com",
+    "password": "$2a$12$3yUgxvRXu3GnhZAJMT11/OaJIyaQEk8PK1ecafnIKSS3ck5vQXZbu",
+    "role": "candidate",
+    "skills": [],
+    "bio": "",
+    "createdAt": "2026-03-14T19:44:27.638Z"
+  },
+  {
+    "_id": "mmqql4ge-o1xx7h3ef",
+    "name": "Test Candidate",
+    "email": "test_candidate@email.com",
+    "password": "$2a$12$F.AJctmMS5x7jP/X9DDhCOYusRMRu6PsWTNMfV8FeWf3NI1vQmggi",
+    "role": "candidate",
+    "skills": [],
+    "bio": "",
+    "createdAt": "2026-03-14T19:46:37.646Z"
+  },
+  {
+    "_id": "mmqqn141-dlg0mv0ct",
+    "name": "Test Employer",
+    "email": "test_employer@email.com",
+    "password": "$2a$12$viXHNg8h/4rE.fT2v0UURO14Il56TQJdWRhhllXM4BkX4M7zHxVPC",
+    "role": "employer",
+    "skills": [],
+    "bio": "",
+    "createdAt": "2026-03-14T19:48:06.625Z"
+  },
+  {
+    "_id": "mmqqpsf5-x80t7azlr",
+    "name": "Final Test",
+    "email": "final_test@test.com",
+    "password": "$2a$12$BgIn7HjmFSutVChG.YweJuPiOC05BVTdBtxVESGAgurnHFz55i1py",
+    "role": "candidate",
+    "skills": [],
+    "bio": "",
+    "createdAt": "2026-03-14T19:50:15.329Z"
+  },
+  {
+    "_id": "mmqqtp8p-zmnamgqmd",
+    "name": "Candidate Test",
+    "email": "candidate_cv_test_123@test.com",
+    "password": "$2a$12$gCTot7AOxAfW6nGeiTENF.1JDlCoVAZdGz.kv7.JscDL86eKtlEau",
+    "role": "candidate",
+    "skills": [],
+    "bio": "",
+    "createdAt": "2026-03-14T19:53:17.833Z"
+  },
+  {
+    "_id": "mmqqwnbv-cok5lqic3",
+    "name": "Test Candidate",
+    "email": "candidate_cv_test_456@test.com",
+    "password": "$2a$12$0HGq.C6W7PchLS6O3HRdpOZ.m0zi5/7oZ0y6Uq9zvwj0JSZTbBK0W",
+    "role": "candidate",
+    "skills": [],
+    "bio": "",
+    "createdAt": "2026-03-14T19:55:35.323Z"
+  },
+  {
+    "_id": "mmqqy6fs-lggibtd2w",
+    "name": "Final Candidate",
+    "email": "candidate_cv_test_final@test.com",
+    "password": "$2a$12$cf6xCnuZ1QZ/EoP51/RR9urtj0I.YTLgSmgGKXddfuQqkhzNLmEYK",
+    "role": "candidate",
+    "skills": [],
+    "bio": "",
+    "createdAt": "2026-03-14T19:56:46.744Z"
+  },
+  {
+    "_id": "mmqr28o4-ngjlj90eq",
+    "name": "Test Candidate One",
+    "email": "test_cand_1@test.com",
+    "password": "$2a$12$WeOfZqcDsi4lL9kBwc4vD.SmayNfCuvdZblERtKhZWHpH4B2e24Xq",
+    "role": "candidate",
+    "skills": [],
+    "bio": "",
+    "createdAt": "2026-03-14T19:59:56.260Z"
+  },
+  {
+    "_id": "mmqr5lpy-subbqloiq",
+    "name": "Test Cand",
+    "email": "testcand@test.com",
+    "password": "$2a$12$n6fRYUV9w4tty0DU77pdLeknojQFPcboVCyyn1GHHTOPSzdbqeASy",
+    "role": "candidate",
+    "skills": [],
+    "bio": "",
+    "createdAt": "2026-03-14T20:02:33.142Z"
   }
 ]

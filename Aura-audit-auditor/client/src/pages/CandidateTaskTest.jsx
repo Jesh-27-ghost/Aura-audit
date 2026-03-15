@@ -4,6 +4,7 @@ import { getTaskById, submitTaskTest } from '../api';
 import toast from 'react-hot-toast';
 import { Camera, Monitor, ShieldAlert, ArrowLeft, Send } from 'lucide-react';
 import TestTaskbar from '../components/TestTaskbar';
+import ConfidenceSlider, { getZone } from '../components/ConfidenceSlider';
 
 export default function CandidateTaskTest() {
     const { taskId } = useParams();
@@ -12,6 +13,7 @@ export default function CandidateTaskTest() {
     const [task, setTask] = useState(null);
     const [loading, setLoading] = useState(true);
     const [testState, setTestState] = useState('PRE_TEST'); // PRE_TEST, RECORDING, SUBMITTING
+    const [confidenceValue, setConfidenceValue] = useState(50);
     
     // Refs for accessing latest state/functions inside event listeners
     const testStateRef = useRef(testState);
@@ -147,6 +149,7 @@ export default function CandidateTaskTest() {
         const formData = new FormData();
         formData.append('screenVideo', screenBlob, 'screen.webm');
         if (webcamBlob) formData.append('webcamVideo', webcamBlob, 'webcam.webm');
+        formData.append('confidenceValue', String(confidenceValue));
 
         try {
             toast.loading('Analyzing your submission... This takes ~1-3 minutes.', { id: 'analyze' });
@@ -213,6 +216,8 @@ export default function CandidateTaskTest() {
                             )}
                         </div>
 
+                        <ConfidenceSlider value={confidenceValue} onChange={setConfidenceValue} />
+
                         <div className="proctoring-notice">
                             <h3>
                                 <ShieldAlert size={18} /> Proctored Session Requirements
@@ -222,6 +227,7 @@ export default function CandidateTaskTest() {
                                 <li><strong>Screen Recording:</strong> Ensure your entire screen is shared to capture your work in external tools (e.g., VS Code).</li>
                                 <li><strong>Webcam Monitoring:</strong> AI will analyze eye movement, distractions, and presence to calculate a Suspicion Score.</li>
                                 <li><strong>Audio:</strong> Background noise and communication will be monitored.</li>
+                                <li><strong>Difficulty:</strong> Set to <strong style={{ color: getZone(confidenceValue).color }}>{getZone(confidenceValue).difficulty}</strong> based on your confidence level.</li>
                             </ul>
                         </div>
 

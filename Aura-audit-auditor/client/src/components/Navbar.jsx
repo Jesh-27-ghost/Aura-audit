@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Shield, LogOut, User, Briefcase, Trophy, BarChart3, Play } from 'lucide-react';
+import { Shield, LogOut, User, Briefcase, Trophy, BarChart3, Play, FileText } from 'lucide-react';
 
 export default function Navbar() {
     const { user, logout } = useAuth();
@@ -52,6 +52,11 @@ export default function Navbar() {
                         </Link>
                         <Link to="/tasks" className={isActive('/tasks') || location.pathname.includes('/tasks/') ? 'nav-link active' : 'nav-link'}>
                             Skill Tests
+                        </Link>
+                        <Link to="/cv-upload" className={isActive('/cv-upload')}>
+                            <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <FileText size={16} /> CV Profile
+                            </span>
                         </Link>
                         <Link to="/analytics" className={isActive('/analytics')}>
                             <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>

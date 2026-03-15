@@ -70,7 +70,7 @@ export default function TestTaskbar({
             {/* Live Media Previews */}
             <div className="taskbar-previews-container">
                 <div className="taskbar-preview-box">
-                    <span className="preview-label">Screen</span>
+                    <span className="preview-label">LIVE: Screen</span>
                     {screenStream ? (
                         <video ref={screenPreviewRef} autoPlay muted className="taskbar-preview-video" />
                     ) : (
@@ -80,7 +80,7 @@ export default function TestTaskbar({
                     )}
                 </div>
                 <div className="taskbar-preview-box">
-                    <span className="preview-label">Camera</span>
+                    <span className="preview-label">LIVE: Camera</span>
                     {webcamStream ? (
                         <video ref={webcamPreviewRef} autoPlay muted className="taskbar-preview-video" />
                     ) : (

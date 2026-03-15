@@ -131,6 +131,17 @@ export default function CandidateTaskSubmissionView() {
                         {submission.behavioralSummary}
                     </p>
                     
+                    {submission.suspicionReasons?.length > 0 && (
+                        <div style={{ marginBottom: '1.5rem' }}>
+                            <h4 style={{ color: 'var(--text-primary)', marginBottom: '0.75rem', fontSize: '1rem' }}>Key Observations:</h4>
+                            <ul className="custom-list" style={{ '--list-color': 'var(--accent-rose)' }}>
+                                {submission.suspicionReasons.map((reason, i) => (
+                                    <li key={i}>{reason}</li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+                    
                     {submission.suspicionDetails?.flaggedMoments?.length > 0 && (
                         <div>
                             <h4 style={{ color: 'var(--text-primary)', marginBottom: '1rem' }}>Flagged Activity:</h4>
