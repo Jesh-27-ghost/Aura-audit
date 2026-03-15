@@ -84,12 +84,17 @@ export const getTaskSubmission = (id) => API.get(`/task-submissions/${id}`);
 export const getMyTaskSubmissions = () => API.get('/task-submissions/my');
 export const getTaskSubmissions = (taskId) => API.get(`/task-submissions/task/${taskId}`);
 
-// Arena
-// export const getArenaLevel = () => API.get('/arena/level');
-// export const getArenaChallenge = (level, language) => API.get('/arena/challenge', { params: { level, language } });
-// export const submitArenaAttempt = (data) => API.post('/arena/submit', data);
+// CV Processing
+export const uploadCV = (formData) => 
+    API.post('/cv/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+        timeout: 60000 // 1 minute allowed for parsing and Gemini review
+    });
+export const getMyCVProfile = () => API.get('/cv/profile');
+export const getAllCVProfiles = () => API.get('/cv/profiles');
+export const generateAdaptiveTest = (data) => API.post('/cv/generate-test', data);
 
-// Logic Puzzle Arena
+// Puzzle Arena
 export const startPuzzleSession = () => API.post('/puzzle/start');
 export const getNextPuzzle = (sessionId) => API.get('/puzzle/next', { params: { sessionId } });
 export const submitPuzzleAnswer = (data) => API.post('/puzzle/submit', data);

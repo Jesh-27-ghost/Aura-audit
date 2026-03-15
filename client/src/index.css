@@ -1,6 +1,6 @@
 /* ======================================
-   SkillBuster — Design System
-   Premium Dark Theme with Gold Accents
+   Aura Audit — Premium Design System
+   Pure Black + Indigo + Gold
    ====================================== */
 
 /* CSS Variables */
@@ -82,18 +82,15 @@ body {
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
 }
-/* Global Cursor Fix — Restore default white system cursor */
-html, body, *, *::before, *::after {
-  cursor: auto !important;
-}
 
-/* Specific overrides for interactive elements */
-a, button, [role="button"], .nav-link, .nav-btn, .btn, .clickable, .role-option, select, input[type="submit"], input[type="button"] {
-  cursor: pointer !important;
-}
+/* Custom cursor — hide default on desktop */
+@media (pointer: fine) {
 
-input, textarea {
-  cursor: text !important;
+  *,
+  *::before,
+  *::after {
+    cursor: none !important;
+  }
 }
 
 a {

@@ -53,7 +53,7 @@ export default function Navbar() {
                         <Link to="/tasks" className={isActive('/tasks') || location.pathname.includes('/tasks/') ? 'nav-link active' : 'nav-link'}>
                             Skill Tests
                         </Link>
-                        <Link to="/puzzle-arena" className={isActive('/puzzle-arena')}>
+                        <Link to="/puzzle" className={isActive('/puzzle')}>
                             <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                                 <Play size={16} /> Logic Arena
                             </span>
@@ -63,7 +63,6 @@ export default function Navbar() {
                                 <FileText size={16} /> CV Profile
                             </span>
                         </Link>
-
                         <Link to="/analytics" className={isActive('/analytics')}>
                             <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                                 <BarChart3 size={16} /> Analytics

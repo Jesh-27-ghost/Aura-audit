@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Navbar from './components/Navbar';
+import CustomCursor from './components/CustomCursor';
 import PageLoader from './components/PageLoader';
 import Home from './pages/Home';
 import Login from './pages/Login';
@@ -15,12 +16,13 @@ import VerifyBadge from './pages/VerifyBadge';
 import Leaderboard from './pages/Leaderboard';
 import AnalyticsDashboard from './pages/AnalyticsDashboard';
 import Walkthrough from './pages/Walkthrough';
-import PuzzleArena from './pages/PuzzleArena';
 import EmployerTasks from './pages/EmployerTasks';
 import TaskSubmissions from './pages/TaskSubmissions';
 import CandidateTaskList from './pages/CandidateTaskList';
 import CandidateTaskTest from './pages/CandidateTaskTest';
 import CandidateTaskSubmissionView from './pages/CandidateTaskSubmissionView';
+import CandidateCVUpload from './pages/CandidateCVUpload';
+import PuzzleArena from './pages/PuzzleArena';
 
 function ProtectedRoute({ children, role }) {
     const { user, loading } = useAuth();
@@ -42,7 +44,7 @@ function ProtectedRoute({ children, role }) {
 function AppRoutes() {
     return (
         <>
-
+            <CustomCursor />
             <Navbar />
             <Routes>
                 <Route path="/" element={<Home />} />
@@ -50,14 +52,6 @@ function AppRoutes() {
                 <Route path="/register" element={<Register />} />
                 <Route path="/leaderboard" element={<Leaderboard />} />
                 <Route path="/walkthrough" element={<Walkthrough />} />
-                <Route
-                    path="/puzzle-arena"
-                    element={
-                        <ProtectedRoute role="candidate">
-                            <PuzzleArena />
-                        </ProtectedRoute>
-                    }
-                />
                 <Route
                     path="/analytics"
                     element={
@@ -82,7 +76,22 @@ function AppRoutes() {
                         </ProtectedRoute>
                     }
                 />
-
+                <Route
+                    path="/cv-upload"
+                    element={
+                        <ProtectedRoute role="candidate">
+                            <CandidateCVUpload />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/puzzle"
+                    element={
+                        <ProtectedRoute role="candidate">
+                            <PuzzleArena />
+                        </ProtectedRoute>
+                    }
+                />
                 <Route
                     path="/tasks/:taskId/test"
                     element={
