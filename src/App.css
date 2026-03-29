@@ -1,0 +1,94 @@
+/* ═══════════════════════════════════════════════════════════════
+   App Layout Styles
+   ═══════════════════════════════════════════════════════════════ */
+
+.dashboard-layout {
+  display: flex;
+  min-height: 100vh;
+  position: relative;
+}
+
+.dashboard-main {
+  flex: 1;
+  margin-left: var(--sidebar-width);
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+  transition: margin-left var(--transition-base);
+}
+
+/* Handle collapsed sidebar */
+.sidebar.collapsed ~ .dashboard-main,
+.dashboard-layout:has(.sidebar.collapsed) .dashboard-main {
+  margin-left: var(--sidebar-collapsed);
+}
+
+/* ── Chart Tooltip (shared) ──────────────────────────────── */
+.chart-tooltip {
+  background: rgba(10, 10, 30, 0.95);
+  border: 1px solid var(--border-color-hover);
+  border-radius: var(--radius-sm);
+  padding: 8px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  box-shadow: var(--shadow-lg);
+  backdrop-filter: blur(12px);
+}
+
+.tooltip-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+}
+
+.tooltip-value {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* ── Chart Card (shared) ─────────────────────────────────── */
+.chart-card {
+  padding: 24px;
+}
+
+.chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.chart-header h3 {
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-primary);
+}
+
+.chart-period {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ── Mono Text (shared) ──────────────────────────────────── */
+.mono-text {
+  font-family: var(--font-mono) !important;
+  font-size: 0.8rem !important;
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .dashboard-main {
+    margin-left: var(--sidebar-collapsed) !important;
+  }
+}
